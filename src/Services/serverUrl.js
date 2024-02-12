@@ -1,1 +1,1 @@
-export const SERVER_URL = "https://pf-backend-exhs.onrender.com/"
+export const SERVER_URL = "https://backend-orvx.onrender.com/"
