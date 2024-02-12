@@ -1,12 +1,14 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { Form } from "react-bootstrap"
 import { Link, useNavigate } from "react-router-dom"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { loginAPI, registerAPI } from "../Services/allAPI";
 import Spinner from 'react-bootstrap/Spinner';
+import { tokenAuthenticationContext } from "../ContextAPI/TokenAuth";
 
 function Auth({insideRegister}) {
+  const {isAuthorized,setIsAuthorized} = useContext(tokenAuthenticationContext)
   const navigate = useNavigate()
   const [spin,setSpin] = useState(false)
   const [userData,setUserData] = useState({
@@ -52,7 +54,8 @@ function Auth({insideRegister}) {
           setSpin(true)
           sessionStorage.setItem("username",result.data.existingUser.username)
           sessionStorage.setItem("token",result.data.token)
-          
+          sessionStorage.setItem("userDetails",JSON.stringify(result.data.existingUser))
+          setIsAuthorized(true)
           setTimeout(() => {
             setUserData({email:"",password:""})
             navigate('/')

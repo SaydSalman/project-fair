@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState,useContext } from 'react'
 import { Button, Modal } from 'react-bootstrap'
 import uplimg from "../assets/images/imgupload.jpg"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { addProjectAPI } from '../Services/allAPI';
+import { addProjectResponseContext } from '../ContextAPI/ContextShare';
 
 function AddProject() {
+  const {addProjectResponse,setAddProjectResponse} = useContext(addProjectResponseContext)
   const [fileStatus,setFileStatus] = useState(false)
   const [preview,setPreview] = useState("")
   const [show, setShow] = useState(false);
@@ -12,7 +15,7 @@ function AddProject() {
     title:"",languages:"",overview:"",github:"",website:"",projectImage:""
   })
   console.log(projectData);
-  const handleAddProject = ()=>{
+  const handleAddProject =async ()=>{
     const {title,languages,overview,github,website,projectImage} = projectData
     if(!title || !languages || !overview || !github || !website || !projectImage){
       toast.info("Please fill the form completely")
@@ -25,11 +28,30 @@ function AddProject() {
       reqBody.append("github",github )
       reqBody.append("website",website)
       reqBody.append("projectImage",projectImage)
-      // api call -reqHeader
-
-      const reqHeader = {
-        "Content-Type":"multipart/form-data"
+      
+      const token = sessionStorage.getItem("token")
+      if(token){
+        const reqHeader = {
+        "Content-Type":"multipart/form-data",
+        "Authorization":`Bearer ${token}`
       }
+      // api call -reqHeader
+      try{const result = await addProjectAPI(reqBody,reqHeader)
+      console.log(result);
+      if(result.status==200){
+        console.log(result.data);
+        handleClose()
+        setAddProjectResponse(result.data)
+      }else{
+        toast.warning(result.response.data)
+      }
+    }catch(err){
+      console.log(err);
+    }
+
+
+      }
+      
     }
   }
   useEffect(()=>{
